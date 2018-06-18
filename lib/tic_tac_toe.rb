@@ -2,28 +2,12 @@ class TicTacToe
   def initialize(board = nil)
     @board = board || Array.new(9, " ")
   end
- def position_taken?(board, index)
-  !(@board[index].nil? || @board[index] == " ")
+ def position_taken?(spot)
+  !(@board[spot].nil? || @board[spot] == " ")
 end
 
-def empty_board?
-  @board.all? do |position|
-  position == nil || position == "" || position == " "
- end
-end
-
-def draw?
-  if full_board?(@board) == true
-    return true
-  end
-end
-
-def top_board_win?(board)
-  if @board[0] == "X" &&  @board[1] == "X" && @board[2] == "X"
-    return true
-   elsif @board[0] == "O" &&  @board[1] == "O" && @board[2] == "O"
-     return true
-  end
+def move(position, char = "X")
+  @board[position.to_i-1] = char
 end
  
 WIN_COMBINATIONS = [
@@ -37,19 +21,21 @@ WIN_COMBINATIONS = [
   [6,4,2]
 ]
 
-def play(board)
-  while !over?(board)
-    turn(board)
+def play
+  while !over? || turn_count < 9
+    turn
   end
-  if won?(board)
-    puts "Congratulations #{winner(board)}!"
-  elsif draw?(board)
-    puts "Cat's Game!"
+  if over?
+    if draw? 
+      puts "Cat's Game!"
+  else 
+    puts "Congratulations #{winner}!"
   end
+ end
 end
 
-def valid_move?(board, index)
-  index.between?(0,8) && !position_taken?(board, index)
+def valid_move?(position)
+ position.to_i.between?(1,9) && !position_taken?(position.to_i-1)
 end
 
 def won?
@@ -64,19 +50,19 @@ def full?(board)
   board.all?{|token| token == "X" || token == "O"}
 end
 
-def draw?(board)
-  !won?(board) && full?(board)
+def draw?
+  !won? && full?
 end
 
-def over?(board)
-  won?(board) || draw?(board)
+def over?
+  won? || draw?
 end
 
 def input_to_index(user_input)
   user_input.to_i - 1
 end
 
-def turn(board)
+def turn
   puts "Please enter 1-9:"
   user_input = gets.strip
   index = input_to_index(user_input)
@@ -98,10 +84,6 @@ end
 
 def turn_count(board)
   board.count{|token| token == "X" || token == "O"}
-end
-
-def move(board, index, player)
-  board[index] = player
 end
 
 def winner(board)
